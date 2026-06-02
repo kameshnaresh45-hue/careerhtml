@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pathfinder — Career Guidance</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1612;
+    --paper: #f8f4ef;
+    --warm: #f0e8db;
+    --accent: #c17d3c;
+    --accent-dark: #8a5420;
+    --accent-light: #e8c99a;
+    --green: #3b5e3e;
+    --green-light: #d6e8d7;
+    --muted: #7a6e65;
+    --border: #d9cfc5;
+    --white: #ffffff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(248,244,239,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); display: inline-block;
+  }
+  .nav-links {
+    display: flex; align-items: center; gap: 2rem; list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none; color: var(--muted); font-size: 0.875rem;
+    font-weight: 400; letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink) !important;
+    color: var(--paper) !important;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-weight: 500 !important;
+  }
+  .nav-cta:hover { background: var(--accent-dark) !important; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    padding: 120px 2.5rem 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block; width: 30px; height: 1px;
+    background: var(--accent);
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+    max-width: 480px;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--white);
+    padding: 14px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    padding: 14px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--ink); transform: translateY(-1px); }
+
+  /* Hero visual */
+  .hero-visual {
+    position: relative;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .hero-card-stack {
+    position: relative; width: 360px; height: 440px;
+  }
+  .stat-card {
+    position: absolute;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+  }
+  .stat-card.main {
+    width: 300px; left: 30px; top: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .stat-card.accent-1 {
+    width: 180px; right: 0; top: 160px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    background: var(--ink);
+    animation: float1 4s ease-in-out infinite;
+  }
+  .stat-card.accent-2 {
+    width: 200px; left: 0; bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    background: var(--green);
+    animation: float2 5s ease-in-out infinite;
+  }
+  @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  .stat-label { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--ink); }
+  .stat-sub { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .stat-card.accent-1 .stat-label { color: rgba(255,255,255,0.6); }
+  .stat-card.accent-1 .stat-value { color: var(--accent-light); font-size: 1.6rem; }
+  .stat-card.accent-1 .stat-sub { color: rgba(255,255,255,0.7); }
+  .stat-card.accent-2 .stat-label { color: var(--green-light); opacity: 0.8; }
+  .stat-card.accent-2 .stat-value { color: #a8d9ab; font-size: 1.6rem; }
+  .stat-card.accent-2 .stat-sub { color: rgba(255,255,255,0.7); }
+
+  .progress-bar-wrap { margin-top: 1rem; }
+  .progress-item { margin-bottom: 10px; }
+  .progress-head { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+  .progress-track { height: 5px; background: var(--warm); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+
+  /* ── SECTION BASE ── */
+  section { padding: 100px 2.5rem; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.72rem; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .section-desc {
+    font-size: 1rem; color: var(--muted); line-height: 1.75;
+    max-width: 560px;
+  }
+
+  /* ── PATHS ── */
+  .paths-section { background: var(--white); }
+  .paths-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+  }
+  .path-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .path-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+  }
+  .path-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.4rem;
+  }
+  .path-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; font-weight: 700;
+    color: var(--ink); margin-bottom: 0.6rem;
+  }
+  .path-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 1.25rem; }
+  .path-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── STEPS / HOW ── */
+  .steps-section { background: var(--paper); }
+  .steps-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    margin-top: 3.5rem;
+    align-items: start;
+  }
+  .step-list { display: flex; flex-direction: column; gap: 0; }
+  .step-item {
+    display: flex; gap: 1.25rem; padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .step-item:first-child { padding-top: 0; }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--accent-light);
+    min-width: 40px;
+    line-height: 1;
+    padding-top: 4px;
+    transition: color 0.2s;
+  }
+  .step-item:hover .step-num { color: var(--accent); }
+  .step-body h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--ink); margin-bottom: 0.4rem;
+  }
+  .step-body p { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+
+  .steps-visual {
+    background: var(--ink);
+    border-radius: 16px;
+    padding: 2.5rem;
+    color: var(--white);
+    position: sticky; top: 100px;
+  }
+  .steps-visual-label {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent-light);
+    margin-bottom: 1rem;
+  }
+  .steps-visual h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    margin-bottom: 1.5rem; line-height: 1.3;
+  }
+  .skill-bars { display: flex; flex-direction: column; gap: 14px; }
+  .skill-row { display: flex; flex-direction: column; gap: 5px; }
+  .skill-head { display: flex; justify-content: space-between; font-size: 0.8rem; }
+  .skill-head span:first-child { color: rgba(255,255,255,0.75); }
+  .skill-head span:last-child { color: var(--accent-light); font-weight: 500; }
+  .skill-track { height: 4px; background: rgba(255,255,255,0.12); border-radius: 99px; }
+  .skill-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+  .quote-block {
+    margin-top: 2rem; padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6; margin-bottom: 1rem;
+  }
+  .quote-author { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+
+  /* ── EXPLORE CAREERS ── */
+  .explore-section { background: var(--white); }
+  .career-tabs {
+    display: flex; gap: 0; margin: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .career-tab {
+    padding: 10px 20px;
+    font-size: 0.875rem; font-weight: 400;
+    color: var(--muted);
+    cursor: pointer; border: none; background: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .career-tab.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 500; }
+  .career-tab:hover:not(.active) { color: var(--ink); }
+
+  .career-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .career-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    transition: transform 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+  .career-card:hover { transform: translateY(-2px); border-color: var(--accent-light); }
+  .career-title { font-weight: 500; font-size: 0.9rem; margin-bottom: 6px; color: var(--ink); }
+  .career-meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.75rem; }
+  .career-salary {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 700; color: var(--accent);
+  }
+  .career-growth {
+    font-size: 0.72rem; color: var(--green);
+    font-weight: 500; margin-left: 8px;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-section { background: var(--ink); }
+  .quiz-inner {
+    max-width: 700px; margin: 0 auto; text-align: center;
+  }
+  .quiz-section .section-label { color: var(--accent-light); }
+  .quiz-section .section-title { color: var(--white); }
+  .quiz-section .section-desc { color: rgba(255,255,255,0.6); margin: 0 auto 2.5rem; }
+  .quiz-options {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; margin-bottom: 2rem; text-align: left;
+  }
+  .quiz-opt {
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 1.1rem 1.25rem;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .quiz-opt:hover { border-color: var(--accent); background: rgba(193,125,60,0.08); }
+  .quiz-opt.selected { border-color: var(--accent); background: rgba(193,125,60,0.12); }
+  .opt-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  .opt-text strong { display: block; font-size: 0.9rem; color: var(--white); font-weight: 500; margin-bottom: 2px; }
+  .opt-text span { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+  .quiz-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--white); margin-bottom: 1.75rem;
+  }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-section { background: var(--paper); }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .testi-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+  }
+  .testi-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem; line-height: 1.7;
+    color: var(--ink); margin-bottom: 1.5rem;
+  }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; color: var(--white);
+  }
+  .testi-name { font-weight: 500; font-size: 0.9rem; color: var(--ink); }
+  .testi-role { font-size: 0.78rem; color: var(--muted); }
+
+  /* ── RESOURCES ── */
+  .resources-section { background: var(--white); }
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .resource-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.2s;
+  }
+  .resource-card:hover { transform: translateY(-3px); }
+  .resource-img {
+    height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+  }
+  .resource-body { padding: 1.25rem 1.5rem; }
+  .resource-type {
+    font-size: 0.68rem; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.4rem;
+  }
+  .resource-body h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--ink); margin-bottom: 0.4rem;
+  }
+  .resource-body p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── CTA BANNER ── */
+  .cta-section {
+    background: var(--accent);
+    padding: 80px 2.5rem;
+    text-align: center;
+  }
+  .cta-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700; color: var(--white);
+    margin-bottom: 1rem;
+  }
+  .cta-section p {
+    font-size: 1rem; color: rgba(255,255,255,0.8);
+    margin-bottom: 2rem;
+  }
+  .btn-white {
+    background: var(--white);
+    color: var(--accent-dark);
+    padding: 14px 36px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .btn-white:hover { transform: translateY(-2px); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: var(--paper);
+    padding: 60px 2.5rem 30px;
+  }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-brand p {
+    font-size: 0.85rem; color: rgba(255,255,255,0.5);
+    line-height: 1.7; margin-top: 0.75rem; max-width: 260px;
+  }
+  footer h5 {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.4); margin-bottom: 1rem; font-weight: 500;
+  }
+  footer ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  footer ul a {
+    text-decoration: none; color: rgba(255,255,255,0.65);
+    font-size: 0.875rem; transition: color 0.15s;
+  }
+  footer ul a:hover { color: var(--accent-light); }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto;
+    padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.8rem; color: rgba(255,255,255,0.35);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-content > * { animation: fadeUp 0.6s ease both; }
+  .hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-content > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-content > *:nth-child(3) { animation-delay: 0.35s; }
+  .hero-content > *:nth-child(4) { animation-delay: 0.45s; }
+  .hero-visual { animation: fadeUp 0.8s ease 0.3s both; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 100px 1.5rem 60px; }
+    .hero-visual { display: none; }
+    .paths-grid { grid-template-columns: 1fr 1fr; }
+    .steps-layout { grid-template-columns: 1fr; }
+    .career-grid { grid-template-columns: 1fr 1fr; }
+    .testi-grid { grid-template-columns: 1fr; }
+    .resources-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .quiz-options { grid-template-columns: 1fr; }
+    nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 70px 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><span class="logo-dot"></span> Pathfinder</a>
+  <ul class="nav-links">
+    <li><a href="#explore">Careers</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#quiz" class="nav-cta">Take the Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section style="padding: 0; background: var(--paper);">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Your career compass</div>
+      <h1>Find the path you were <em>meant</em> to walk</h1>
+      <p class="hero-desc">Personalized career guidance for students, job seekers, and professionals ready for their next chapter. Backed by industry data and expert mentors.</p>
+      <div class="hero-actions">
+        <a href="#quiz" class="btn-primary">Start Career Quiz →</a>
+        <a href="#explore" class="btn-secondary">Explore Careers</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="stat-card main">
+          <div class="stat-label">Your Profile Match</div>
+          <div class="stat-value">87%</div>
+          <div class="stat-sub">UX Design — Strong match</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-item">
+              <div class="progress-head"><span>Design Thinking</span><span>92%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:92%"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-head"><span>Communication</span><span>85%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-head"><span>Research</span><span>78%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:78%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card accent-1">
+          <div class="stat-label">Avg. Salary</div>
+          <div class="stat-value">₹12 LPA</div>
+          <div class="stat-sub">Entry level in India</div>
+        </div>
+        <div class="stat-card accent-2">
+          <div class="stat-label">Job Growth</div>
+          <div class="stat-value">+24%</div>
+          <div class="stat-sub">By 2028 projection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAREER PATHS -->
+<section class="paths-section" id="explore">
+  <div class="container">
+    <div class="section-label">What we offer</div>
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem; margin-bottom: 0;">
+      <div>
+        <h2 class="section-title">Explore career<br>pathways</h2>
+      </div>
+      <p class="section-desc" style="margin-bottom:0">From tech to the arts, explore hundreds of career paths with real data on salaries, growth, and skills required.</p>
+    </div>
+    <div class="paths-grid">
+      <div class="path-card">
+        <div class="path-icon" style="background:#fef3e8">💻</div>
+        <h3>Technology & Engineering</h3>
+        <p>Software development, data science, cybersecurity, and more. The fastest-growing sector with global opportunities.</p>
+        <span class="path-tag" style="background:#fef3e8; color: var(--accent-dark)">250+ careers</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon" style="background:#d6e8d7">🏥</div>
+        <h3>Healthcare & Medicine</h3>
+        <p>Physicians, nurses, health informatics, research scientists. A deeply meaningful field with lifelong demand.</p>
+        <span class="path-tag" style="background:#d6e8d7; color: var(--green)">180+ careers</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon" style="background:#e8eaf6">🎨</div>
+        <h3>Creative & Design</h3>
+        <p>UX/UI, graphic design, content creation, architecture. Where imagination meets real-world impact.</p>
+        <span class="path-tag" style="background:#e8eaf6; color: #4a4a9e">140+ careers</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon" style="background:#fff0f0">📊</div>
+        <h3>Business & Finance</h3>
+        <p>Management consulting, investment banking, entrepreneurship. Build and grow organisations that matter.</p>
+        <span class="path-tag" style="background:#fff0f0; color: #b03030">200+ careers</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon" style="background:#f0f8f0">🎓</div>
+        <h3>Education & Social Impact</h3>
+        <p>Teaching, counselling, policy, nonprofits. Careers defined by purpose, community, and lasting change.</p>
+        <span class="path-tag" style="background:#f0f8f0; color: var(--green)">120+ careers</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon" style="background:#fff8e8">⚡</div>
+        <h3>Law & Government</h3>
+        <p>Civil service, legal practice, public policy, judiciary. Shape the systems that govern everyday life.</p>
+        <span class="path-tag" style="background:#fff8e8; color: #7a5c10">90+ careers</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="steps-section" id="how">
+  <div class="container">
+    <div class="section-label">The process</div>
+    <h2 class="section-title">How Pathfinder works</h2>
+    <div class="steps-layout">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Discover your strengths</h4>
+            <p>Our 10-minute quiz assesses your personality type, natural strengths, work style preferences, and interests using validated frameworks.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Get matched to careers</h4>
+            <p>We surface careers that align with your profile — complete with salary ranges, growth projections, and what a typical day looks like.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Build your skills roadmap</h4>
+            <p>Receive a personalised plan: certifications to earn, skills to develop, and experiences to seek before entering your target field.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Connect with mentors</h4>
+            <p>Talk directly to professionals in your chosen field who've walked the path you're considering — and get real, unfiltered insights.</p>
+          </div>
+        </div>
+      </div>
+      <div class="steps-visual">
+        <div class="steps-visual-label">Skills snapshot</div>
+        <h3>Ananya's career readiness profile</h3>
+        <div class="skill-bars">
+          <div class="skill-row">
+            <div class="skill-head"><span>Analytical thinking</span><span>88%</span></div>
+            <div class="skill-track"><div class="skill-fill" style="width:88%"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-head"><span>Communication</span><span>75%</span></div>
+            <div class="skill-track"><div class="skill-fill" style="width:75%"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-head"><span>Creative problem solving</span><span>92%</span></div>
+            <div class="skill-track"><div class="skill-fill" style="width:92%"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-head"><span>Technical proficiency</span><span>60%</span></div>
+            <div class="skill-track"><div class="skill-fill" style="width:60%"></div></div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-head"><span>Leadership</span><span>70%</span></div>
+            <div class="skill-track"><div class="skill-fill" style="width:70%"></div></div>
+          </div>
+        </div>
+        <div class="quote-block">
+          <div class="quote-text">"Pathfinder helped me realise I was already 80% of the way to a career in product design — I just needed the right roadmap."</div>
+          <div class="quote-author">— Ananya R., Product Designer at Razorpay</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAREER EXPLORER -->
+<section class="explore-section">
+  <div class="container">
+    <div class="section-label">In-demand roles</div>
+    <h2 class="section-title">Top careers right now</h2>
+    <div class="career-tabs">
+      <button class="career-tab active" onclick="switchTab(this,'tech')">Technology</button>
+      <button class="career-tab" onclick="switchTab(this,'business')">Business</button>
+      <button class="career-tab" onclick="switchTab(this,'creative')">Creative</button>
+      <button class="career-tab" onclick="switchTab(this,'health')">Healthcare</button>
+    </div>
+    <div class="career-grid" id="career-grid"></div>
+  </div>
+</section>
+
+<!-- QUIZ CTA -->
+<section class="quiz-section" id="quiz">
+  <div class="container">
+    <div class="quiz-inner">
+      <div class="section-label">Career quiz</div>
+      <h2 class="section-title">What kind of work energises you?</h2>
+      <p class="section-desc">Answer a few quick questions to get your personalised career matches.</p>
+      <div class="quiz-question" id="quiz-question">I feel most alive when I'm…</div>
+      <div class="quiz-options" id="quiz-options">
+        <div class="quiz-opt" onclick="selectOpt(this)">
+          <div class="opt-icon">🧩</div>
+          <div class="opt-text"><strong>Solving complex problems</strong><span>Analytical, logical, strategic</span></div>
+        </div>
+        <div class="quiz-opt" onclick="selectOpt(this)">
+          <div class="opt-icon">🎨</div>
+          <div class="opt-text"><strong>Creating something new</strong><span>Design, art, invention</span></div>
+        </div>
+        <div class="quiz-opt" onclick="selectOpt(this)">
+          <div class="opt-icon">🤝</div>
+          <div class="opt-text"><strong>Helping other people</strong><span>Coaching, teaching, healing</span></div>
+        </div>
+        <div class="quiz-opt" onclick="selectOpt(this)">
+          <div class="opt-icon">📈</div>
+          <div class="opt-text"><strong>Building and growing things</strong><span>Business, leadership, scale</span></div>
+        </div>
+      </div>
+      <a href="#" class="btn-primary" style="font-size:1rem; padding: 16px 40px; border-radius:6px;">See my career matches →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-label">Success stories</div>
+    <h2 class="section-title">They found their path.</h2>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-quote">"I was stuck between law and data science for two years. Pathfinder's career match, paired with a 30-minute mentor call, made the choice crystal clear."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#3b5e3e">RK</div>
+          <div>
+            <div class="testi-name">Rohit Krishnamurthy</div>
+            <div class="testi-role">Data Analyst, Flipkart — formerly pre-law</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"The skills roadmap told me exactly what certifications I needed. Within 8 months, I had a new job in UX research at a startup I love."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:var(--accent)">PM</div>
+          <div>
+            <div class="testi-name">Priya Mathur</div>
+            <div class="testi-role">UX Researcher, Swiggy</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"As a first-generation college student, I had no network. Pathfinder connected me to mentors who genuinely cared and opened doors I didn't know existed."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#4a4a9e">AS</div>
+          <div>
+            <div class="testi-name">Arjun Selvam</div>
+            <div class="testi-role">Software Engineer, Zoho</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="resources-section" id="resources">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem; margin-bottom: 0;">
+      <div>
+        <div class="section-label">Learn & grow</div>
+        <h2 class="section-title">Free resources</h2>
+      </div>
+      <a href="#" class="btn-secondary">Browse all resources →</a>
+    </div>
+    <div class="resources-grid">
+      <div class="resource-card">
+        <div class="resource-img" style="background:#fef3e8">📝</div>
+        <div class="resource-body">
+          <div class="resource-type">Guide</div>
+          <h4>How to write a CV that gets interviews</h4>
+          <p>A step-by-step guide with templates and real examples from hiring managers across industries.</p>
+        </div>
+      </div>
+      <div class="resource-card">
+        <div class="resource-img" style="background:#d6e8d7">🎙️</div>
+        <div class="resource-body">
+          <div class="resource-type">Podcast</div>
+          <h4>Career pivots: stories of bold transitions</h4>
+          <p>Real conversations with people who left comfortable careers for something more meaningful.</p>
+        </div>
+      </div>
+      <div class="resource-card">
+        <div class="resource-img" style="background:#e8eaf6">🗓️</div>
+        <div class="resource-body">
+          <div class="resource-type">Workshop</div>
+          <h4>Ace your next job interview</h4>
+          <p>Live online workshop every Saturday. Practice with mock interviews and get expert feedback.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Your next chapter starts with one step.</h2>
+    <p>Join 40,000+ students and professionals who've found their direction with Pathfinder.</p>
+    <a href="#quiz" class="btn-white">Take the free career quiz</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo" style="color: var(--paper); font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; display:flex; align-items:center; gap:10px; text-decoration:none">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block"></span>Pathfinder
+      </div>
+      <p>Career guidance that meets you where you are — and helps you get where you're meant to go.</p>
+    </div>
+    <div>
+      <h5>Explore</h5>
+      <ul>
+        <li><a href="#">Career Paths</a></li>
+        <li><a href="#">Salary Data</a></li>
+        <li><a href="#">Skill Assessments</a></li>
+        <li><a href="#">Job Board</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Support</h5>
+      <ul>
+        <li><a href="#">Find a Mentor</a></li>
+        <li><a href="#">Workshops</a></li>
+        <li><a href="#">Resources</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Pathfinder Career Guidance. All rights reserved.</span>
+    <span>Made with care for career seekers everywhere.</span>
+  </div>
+</footer>
+
+<script>
+const careerData = {
+  tech: [
+    { title:'Software Engineer', meta:'Full-stack · Remote friendly', salary:'₹8–28 LPA', growth:'+22%' },
+    { title:'Data Scientist', meta:'ML/AI · High demand', salary:'₹10–35 LPA', growth:'+31%' },
+    { title:'UX Designer', meta:'Product · Creative', salary:'₹6–20 LPA', growth:'+18%' },
+    { title:'Cybersecurity Analyst', meta:'Infosec · Critical', salary:'₹8–30 LPA', growth:'+35%' },
+  ],
+  business: [
+    { title:'Management Consultant', meta:'Strategy · Travel', salary:'₹10–40 LPA', growth:'+14%' },
+    { title:'Product Manager', meta:'Tech/FMCG · Leadership', salary:'₹12–45 LPA', growth:'+26%' },
+    { title:'Financial Analyst', meta:'Banking · Analytical', salary:'₹6–22 LPA', growth:'+11%' },
+    { title:'Marketing Manager', meta:'Brand · Creative', salary:'₹7–25 LPA', growth:'+10%' },
+  ],
+  creative: [
+    { title:'Graphic Designer', meta:'Visual · Freelance-friendly', salary:'₹4–16 LPA', growth:'+8%' },
+    { title:'Content Strategist', meta:'Digital · Writing', salary:'₹5–18 LPA', growth:'+15%' },
+    { title:'Architect', meta:'Built environment', salary:'₹5–20 LPA', growth:'+7%' },
+    { title:'Film Editor', meta:'Media · Post-production', salary:'₹4–20 LPA', growth:'+12%' },
+  ],
+  health: [
+    { title:'Doctor (MBBS)', meta:'Clinical · High respect', salary:'₹8–50 LPA', growth:'+15%' },
+    { title:'Clinical Psychologist', meta:'Mental health · Growing', salary:'₹5–18 LPA', growth:'+28%' },
+    { title:'Health Data Analyst', meta:'Tech + Healthcare', salary:'₹7–22 LPA', growth:'+30%' },
+    { title:'Physiotherapist', meta:'Rehab · Community', salary:'₹4–15 LPA', growth:'+18%' },
+  ]
+};
+
+function renderGrid(key) {
+  const grid = document.getElementById('career-grid');
+  grid.innerHTML = careerData[key].map(c => `
+    <div class="career-card">
+      <div class="career-title">${c.title}</div>
+      <div class="career-meta">${c.meta}</div>
+      <div>
+        <span class="career-salary">${c.salary}</span>
+        <span class="career-growth">${c.growth} growth</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchTab(el, key) {
+  document.querySelectorAll('.career-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(key);
+}
+
+function selectOpt(el) {
+  document.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+renderGrid('tech');
+</script>
+</body>
+</html>
